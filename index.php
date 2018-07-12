@@ -2,12 +2,11 @@
 <html>
 
 <head>
-    <title>gizyHelpBoard</title>
+    <title>gizyProtectImage</title>
     <meta charset="UTF-8">
     <meta name="description" content=""/>
     <meta name="keywords" content=""/>
     <link rel="stylesheet" href="css.css" type="text/css">
-    <!--    <script type="text/javascript" src="myHelpBoard/gizyBoard.js"></script>-->
 </head>
 
 <body>
@@ -17,24 +16,12 @@
 
 <main>
 
-    <!--        <div class="c">-->
-    <!---->
-    <!--            <div>-->
-    <!--                <img class="cf" src="img/2b.png" style="position: relative;">-->
-    <!--                <img src="img/1b.png" style="position: relative;top: -200px;left: 34px;">-->
-    <!--            </div>-->
-    <!--        </div>-->
-
     <div class="c">
         <?php
         include 'gizySecPic.php';
-        echo imageSecure('kot4.jpg', 0, 0);
-        echo imageSecure('kot2.jpg', 0, 0);
+        echo imageSecure('srcImg/kot2.jpg', 0, 0);
+//        echo imageSecure('imgSrc/kot2.jpg', 0, 0);
 
-        //        echo imageSecure('1.jpg', 0, 0);
-        //        echo imageSecure('2.jpg', 0, 0);
-        //        echo imageSecure('3.jpg', 0, 0);
-        //        echo imageSecure('4.jpg', 0, 0);
         ?>
     </div>
 

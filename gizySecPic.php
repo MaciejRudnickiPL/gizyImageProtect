@@ -1,7 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: GIzyPL
+ * gizyProtectImage
+ * User: Maciej Rudnicki
  * Date: 2018-07-11
  * Time: 10:08
  */
@@ -10,7 +10,6 @@
 function imageSecure($strImageToProtection, $maxHeight, $maxWitdh)
 {
     error_reporting(E_ALL);
-    $myImg = '';
     $image_s = imagecreatefromstring(file_get_contents($strImageToProtection));
     $width = imagesx($image_s);
     $height = imagesy($image_s);
