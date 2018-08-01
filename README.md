@@ -58,12 +58,15 @@ set PHP GD library
 __List of features ready and TODOs for future development__
 
 __Features:__
-* start testing
-* add array for list of images
-
+* creating a back image (png)
+* creating a front image (png)
+* resize image 
+* get html with css styles 
 
 __To-do list:__
 * add adds to config 
+* start testing
+* add array for list of images
 
 ## Status
 v 1.0
