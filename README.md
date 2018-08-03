@@ -32,24 +32,36 @@ set PHP GD library
 
 ## Code Examples
 ```* GIP - Gizy Image Protection
+confiugure:
+class GipConfig:
+public $config = [
+        'pettern' => [ // pettern of png mask
+            'width' => 30,// width of pettern
+            'height' => 30,// height of pettern
+            'marginHeight' => 15, // margin height
+            'marginWidth' => 15// margin Width
+        ],
+        'dirImage' => 'srcImg',// directory for output png image
+    ];
+
  <?php
     include 'Gip.php';
     $gip = new \gizyGip\Gip('image.jpg');   //image to protect
     $gip->createProtectImg(); //no resize
-    echo $gip->getHtmlImgProtect();
+    echo $gip->getHtmlImgProtect();//get html 
 
     $gipResize = new \gizyGip\Gip('image1.jpg');  //image to protect
     $gipResize->createProtectImgResize(300, 500); //resize to 300x500px
-    echo $gipResize->getHtmlImgProtect();
+    echo $gipResize->getHtmlImgProtect();//get html 
 
     $gipResize2 = new \gizyGip\Gip('image2.jpg');  //image to protect
     $gipResize2->createProtectImgResize(300, null); //resize to 300px witdh and scaled height
-    echo $gipResize2->getHtmlImgProtect();
+    echo $gipResize2->getHtmlImgProtect();//get html 
 
 
     $gipResize3 = new \gizyGip\Gip('image3.jpg');  //image to protect
     $gipResize3->createProtectImgResize(null, 300); //resize to 300px height and scaled width
-    echo $gipResize3->getHtmlImgProtect();
+    echo $gipResize3->getHtmlImgProtect(); //get html 
 
     ?>
 ```
