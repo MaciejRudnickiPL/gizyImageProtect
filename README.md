@@ -14,6 +14,7 @@
 ## General info
 The class for create protected image without use JavaScript. Use only php and css 3.0.  
 This class generates two png images, each with transparent areas. Images, after overlapping, complement each other, creating a full picture.
+test www: http://gip.tu3mam.pl/
 
 You can: 
 * creating a back image (png)
@@ -48,6 +49,7 @@ public $config = [
     include 'Gip.php';
     $gip = new \gizyGip\Gip('image.jpg');   //image to protect
     $gip->createProtectImg(); //no resize
+    echo $gip->showInfo(); //showing info 
     echo $gip->getHtmlImgProtect();//get html 
 
     $gipResize = new \gizyGip\Gip('image1.jpg');  //image to protect
@@ -62,6 +64,8 @@ public $config = [
     $gipResize3 = new \gizyGip\Gip('image3.jpg');  //image to protect
     $gipResize3->createProtectImgResize(null, 300); //resize to 300px height and scaled width
     echo $gipResize3->getHtmlImgProtect(); //get html 
+    
+    
 
     ?>
 ```
@@ -75,14 +79,15 @@ __Features:__
 * resize image 
 * get html with css styles 
 
+
 __To-do list:__
-* add adds to config 
+* adding "adds" parameter to config 
 * start testing
-* add array for list of images
+* adding a array for list of images
+* creating an png image from the mask that has been uploaded
 
 ## Status
-v 1.0
-testing 
+v 1.0 testing 
 
 ## Contact
 Created by [maciejrudnickipl@gmail.com] - feel free to contact me!
