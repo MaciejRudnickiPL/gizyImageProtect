@@ -330,8 +330,8 @@ class Gip
 
                 $this->gipImage = new GipImage($this->imageToProtect);
 
-                $this->divWidth = $this->gipImage->height;
-                $this->divHeight = $this->gipImage->width;
+                $this->divWidth = $this->gipImage->width;
+                $this->divHeight = $this->gipImage->heigh;
 
 
                 $this->imageRevers = GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_1.png';
