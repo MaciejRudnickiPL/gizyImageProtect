@@ -2,7 +2,7 @@
 /**
  * Created by -=Gizy=- .
  * User: Maciej Rudnicki
- * e-mail: maciejrudnickipl@gmail.c
+ * e-mail: maciejrudnickipl@gmail.com
  * Date: 2018-07-23
  * Time: 16:01
  */
@@ -16,10 +16,9 @@ class GipConfig
 
     public $config = [
         'pettern' => [
-            'width' => 30,// szerokość wycięcia
-            'height' => 30,// wysokość wycięcia
-            'marginHeight' => 15, // margines wysokość
-            'marginWidth' => 15// margines szerokość
+            'shapes' => 10,
+            'minShapeOfImage' => 7,//maxImageSize/minShapeOfImage image 300 => 300/10 = 30
+            'maxShapeOfImage' => 3,//maxImageSize/maxShapeOfImage image 300 => 300/3 = 100
         ],
         'dirImage' => 'srcImg',// katalog dla zdjęć
     ];
@@ -55,6 +54,7 @@ class GipConfig
     private function __clone()
     {
     }
+
 }
 
 class GipImage
@@ -72,12 +72,11 @@ class GipImage
             $this->fileName = $fileName;
 
             $this->image_s = imagecreatefromstring(file_get_contents($this->fileName));
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ . 'GipImage->__construct: Get image file.');
             $this->fileNameShort = pathinfo($this->fileName)['filename'];
 
             $this->getSizeFromImg();
         } else {
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .'ALERT: No file to protect.');
+            GipConfig::getInstance()->addAlert('ALERT: No file to protect.');
         }
         return $this;
     }
@@ -87,7 +86,6 @@ class GipImage
     {
         $this->width = imagesx($this->image_s);
         $this->height = imagesy($this->image_s);
-        GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .'ALERT: No file to protect.');
     }
 
     public function setWidth($width)
@@ -124,30 +122,21 @@ class GipMask
         $this->width = $width;
     }
 
-    public function createMask($colorBack, $colorFront, $adds)
+    public function createMask($colorBack, $colorFront, $adds, $shape)
     {
         //create img
-        GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Start create mask');
-        $pettern = GipConfig::getInstance()->config['pettern'];
+        GipConfig::getInstance()->addAlert('GipMask->createMask: Start create mask');
+
         $dirImg = GipConfig::getInstance()->config['dirImage'];
         $maskGen = imagecreatetruecolor($this->width, $this->height);
 
         //wypełnienie w zależności od color
         imagefill($maskGen, 0, 0, $colorBack);
+        for ($x = 0; $x < GipConfig::getInstance()->config['pettern']['shapes']; $x++) {
 
-        $startX = $pettern['width'];
-        $startY = $pettern['height'];
-
-        //pettern fill
-        while ($startY + $pettern['height'] < $this->height) {
-            imagefilledrectangle($maskGen, $startX, $startY, $startX + $pettern['width'] + $adds, $startY + $pettern['height'] + $adds, $colorFront);
-            $startX = $startX + $pettern['width'] + $pettern['marginWidth'];
-
-            if ($startX + $pettern['width'] + $pettern['marginWidth'] > $this->width) {
-                $startX = $pettern['width'];
-                $startY = $startY + $pettern['height'] + $pettern['marginHeight'];
-            }
+            imagefilledellipse($maskGen, $shape[$x][0], $shape[$x][1], $shape[$x][2], $shape[$x][2], $colorFront);
         }
+
 
         if (is_dir($dirImg)) {
 //            imagepng($maskGen, $this->imageMaskFileName);
@@ -158,12 +147,11 @@ class GipMask
                 imagepng($maskGen, $dirImg . '/mask2.png');
                 $this->imageMaskFileName = $dirImg . '/mask2.png';
             }
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Save mask as png' . $this->imageMaskFileName);
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Mask size' . $this->width . ' x ' . $this->height . ' px');
+            GipConfig::getInstance()->addAlert('GipMask->createMask: Save mask as png' . $this->imageMaskFileName);
             $this->imageMaskGD = imagecreatefrompng($this->imageMaskFileName);
 
         } else {
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': No dirImage');
+            GipConfig::getInstance()->addAlert('GipMask->createMask: No dirImage');
         }
 
         //usunięcie temapa
@@ -174,7 +162,7 @@ class GipMask
     public function deleteMask()
     {
         unlink($this->imageMaskFileName);
-        GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Delete temp mask');
+        GipConfig::getInstance()->addAlert('GipMask->deleteMask: Delete temp mask');
     }
 
 
@@ -246,7 +234,7 @@ class Gip
             $this->imageToProtect = $imgToProtect;
 
         } else {
-            GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .'ALERT: No file to protect.');
+            GipConfig::getInstance()->addAlert('ALERT: No file to protect.');
             $this->imageToProtect = null;
         }
     }
@@ -260,14 +248,16 @@ class Gip
     function createProtectImgResize($newWidth, $newHeight)
     {
 
-
+        $shapePost = [];
         if ($this->imageToProtect) {
             if (is_null($newWidth) && is_null($newHeight)) {
                 $this->createProtectImg();// TODO: error
             } else {
                 for ($pic = 0; $pic < 2; $pic++) {
 
-                    GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Start create gip: ' . $pic);
+                    GipConfig::getInstance()->addAlert('Gip->createProtectImg: Start create gip: ' . $pic);
+
+                    $conf = GipConfig::getInstance()->config;
 
                     $this->gipImage = new GipImage($this->imageToProtect);
                     $size = new GipRescale($this->gipImage, $newWidth, $newHeight);
@@ -278,8 +268,8 @@ class Gip
                     $this->divWidth = $newWidth;
                     $this->divHeight = $newHeight;
 
-                    $this->imageRevers = GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_1.png';
-                    $this->imageAvers = GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_0.png';
+                    $this->imageRevers = $conf['dirImage'] . '/' . $this->gipImage->fileNameShort . '_1.png';
+                    $this->imageAvers = $conf['dirImage'] . '/' . $this->gipImage->fileNameShort . '_0.png';
 
                     $image = imagecreatetruecolor($newWidth, $newHeight);
                     $colorAvers = imagecolorallocate($image, 0, 0, 0);//czarny
@@ -289,16 +279,21 @@ class Gip
                     $destination = imagecreatetruecolor($newWidth, $newHeight);
 
                     imagecopyresampled($destination, $this->gipImage->image_s, 0, 0, 0, 0, $newWidth, $newHeight, $this->gipImage->width, $this->gipImage->height);
-                    GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': ' . $newWidth . 'x' . $newHeight . ' px');
+                    GipConfig::getInstance()->addAlert('Gip->createProtectImg: resize img to: ' . $newWidth . 'x' . $newHeight . ' px');
                     $this->gipImage->image_s = $destination;
 
                     $mask = new GipMask($this->gipImage);
                     $mask->setSize($newHeight, $newWidth);
 
+
+                    if (empty($shapePost)) {
+                        $shapePost = $this->shapePosArray();
+                    }
+
                     if ($pic == 0) {
-                        $mask->createMask($colorRevers, $colorAvers, 2);//TODO: przenieść adds do configu
+                        $mask->createMask($colorRevers, $colorAvers, 2, $shapePost);//TODO: przenieść adds do configu
                     } elseif ($pic == 1) {
-                        $mask->createMask($colorAvers, $colorRevers, 2);
+                        $mask->createMask($colorAvers, $colorRevers, 2, $shapePost);
                     }
 
                     $mask->deleteMask();
@@ -312,9 +307,9 @@ class Gip
                     imagefill($this->gipImage->image_s, 0, 0, $red);
 
                     if (imagepng($this->gipImage->image_s, GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_' . $pic . '.png')) {
-                        GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Save image in png');
+                        GipConfig::getInstance()->addAlert('Gip->createProtectImg: Save image in png');
                     } else {
-                        GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Save image in png error');
+                        GipConfig::getInstance()->addAlert('Gip->createProtectImg: Save image in png error');
                     }
                 }
             }
@@ -324,14 +319,15 @@ class Gip
     public
     function createProtectImg()
     {
+        $shapePost = [];
         if ($this->imageToProtect) {
             for ($pic = 0; $pic < 2; $pic++) {
-                GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Start create gip: ' . $pic);
+                GipConfig::getInstance()->addAlert('Gip->createProtectImg: Start create gip: ' . $pic);
 
                 $this->gipImage = new GipImage($this->imageToProtect);
 
-                $this->divWidth = $this->gipImage->width;
-                $this->divHeight = $this->gipImage->heigh;
+                $this->divWidth = $this->gipImage->height;
+                $this->divHeight = $this->gipImage->width;
 
 
                 $this->imageRevers = GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_1.png';
@@ -339,34 +335,53 @@ class Gip
 
                 $image = imagecreatetruecolor($this->gipImage->width, $this->gipImage->height);
                 $colorAvers = imagecolorallocate($image, 0, 0, 0);//czarny
-                $colorRevers = imagecolorallocate($image, 255, 0, 255);//bialy
+                $colorRevers = imagecolorallocate($image, 255, 255, 255);//bialy
                 imagealphablending($image, true);
 
                 imagecopyresampled($this->gipImage->image_s, $this->gipImage->image_s, 0, 0, 0, 0, $this->gipImage->width, $this->gipImage->height, $this->gipImage->width, $this->gipImage->height);
                 $mask = new GipMask($this->gipImage);
 
+
+                if (empty($shapePost)) {
+                    $shapePost = $this->shapePosArray();
+                }
+
                 if ($pic == 0) {
-                    $mask->createMask($colorRevers, $colorAvers, 0);
+                    $mask->createMask($colorRevers, $colorAvers, 0, $shapePost);
                 } elseif ($pic == 1) {
-                    $mask->createMask($colorAvers, $colorRevers, 2);
+                    $mask->createMask($colorAvers, $colorRevers, 2, $shapePost);
                 }
 
                 $mask->deleteMask();
-                $transparent = imagecolorallocate($mask->imageMaskGD, 255, 0, 255);
+                $transparent = imagecolorallocate($mask->imageMaskGD, 255, 255, 255);
                 imagecolortransparent($mask->imageMaskGD, $transparent);
-                $red = imagecolorallocate($mask->imageMaskGD, 255, 0, 255);
+                $red = imagecolorallocate($mask->imageMaskGD, 255, 255, 255);
                 imagecopymerge($this->gipImage->image_s, $mask->imageMaskGD, 0, 0, 0, 0, $this->gipImage->width, $this->gipImage->height, 100);
                 imagecolortransparent($this->gipImage->image_s, $red);
                 imagefill($this->gipImage->image_s, 0, 0, $red);
 
                 if (imagepng($this->gipImage->image_s, GipConfig::getInstance()->config['dirImage'] . '/' . $this->gipImage->fileNameShort . '_' . $pic . '.png')) {
-                    GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Save image in png');
+                    GipConfig::getInstance()->addAlert('Gip->createProtectImg: Save image in png');
                 } else {
-                    GipConfig::getInstance()->addAlert(__CLASS__ . __FUNCTION__ .': Save image in png error');
+                    GipConfig::getInstance()->addAlert('Gip->createProtectImg: Save image in png error');
                 }
             }
         }
 
+    }
+
+    private function shapePosArray()
+    {
+        $conf = GipConfig::getInstance()->config;
+        $shapePos = [];
+        for ($x = 0; $x < $conf['pettern']['shapes']; $x++) {
+            $xPos = rand(0, ($this->gipImage->width));
+            $yPos = rand(0, $this->gipImage->height);
+            $sizePos = rand($this->gipImage->width / $conf['pettern']['minShapeOfImage'], $this->gipImage->width / $conf['pettern']['maxShapeOfImage']);
+            array_push($shapePos, array($xPos, $yPos, $sizePos));
+        }
+
+        return $shapePos;
     }
 
     public function getHtmlImgProtect()
