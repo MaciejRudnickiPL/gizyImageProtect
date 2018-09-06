@@ -36,11 +36,10 @@ set PHP GD library
 confiugure:
 class GipConfig:
 public $config = [
-        'pettern' => [ // pettern of png mask
-            'width' => 30,// width of pettern
-            'height' => 30,// height of pettern
-            'marginHeight' => 15, // margin height
-            'marginWidth' => 15// margin Width
+        'pettern' => [
+            'shapes' => 10,
+            'minShapeOfImage' => 7,//maxImageSize/minShapeOfImage image 300 => 300/10 = 30
+            'maxShapeOfImage' => 3,//maxImageSize/maxShapeOfImage image 300 => 300/3 = 100
         ],
         'dirImage' => 'srcImg',// directory for output png image
     ];
@@ -87,7 +86,7 @@ __To-do list:__
 * creating an png image from the mask that has been uploaded
 
 ## Status
-v 1.0 testing 
+v 1.1 testing 
 
 ## Contact
 Created by [maciejrudnickipl@gmail.com] - feel free to contact me!
