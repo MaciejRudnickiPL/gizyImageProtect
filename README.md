@@ -14,7 +14,7 @@
 ## General info
 The class for create protected image without use JavaScript. Use only php and css 3.0.  
 This class generates two png images, each with transparent areas. Images, after overlapping, complement each other, creating a full picture.
-test www: http://gip.tu3mam.pl/
+test www: http://gip.x20.pl/
 
 You can: 
 * creating a back image (png)
